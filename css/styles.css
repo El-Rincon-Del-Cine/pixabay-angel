@@ -1,0 +1,80 @@
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');
+
+body {
+    background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+    background-size: 400% 400%;
+    animation: fondoAnimado 10s infinite alternate ease-in-out;
+}
+
+@keyframes fondoAnimado {
+    0% { background-position: 0% 50%; }
+    100% { background-position: 100% 50%; }
+}
+
+h1 {
+    font-size: 3rem;
+    text-shadow: 3px 3px 10px #00c3ff;
+    animation: glow 2s infinite alternate;
+    color: white;
+}
+
+@keyframes glow {
+    0% { text-shadow: 3px 3px 10px #00c3ff; }
+    100% { text-shadow: 3px 3px 20px #ff0099; }
+}
+
+.input-group {
+    max-width: 600px;
+    margin: auto;
+}
+
+.form-control {
+    border: 2px solid #00c3ff;
+    box-shadow: 0px 0px 10px #00c3ff;
+    font-size: 1.2rem;
+    color: #fff;
+    background: rgba(0, 0, 0, 0.7);
+}
+
+.btn-custom {
+    background: #00c3ff;
+    border: none;
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #000;
+    transition: 0.3s;
+}
+
+.btn-custom:hover {
+    background: #ff0099;
+    box-shadow: 0px 0px 15px #ff0099;
+    transform: scale(1.1);
+}
+
+#heroResult {
+    margin-top: 20px;
+}
+
+.list-group-item {
+    background: rgba(255, 255, 255, 0.1);
+    color: #00c3ff;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+.list-group-item:hover {
+    background: #ff0099;
+    color: white;
+    transform: scale(1.05);
+}
+
+.hero-img {
+    width: 300px;
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px #00c3ff;
+    transition: transform 0.3s;
+}
+
+.hero-img:hover {
+    transform: scale(1.1);
+}
