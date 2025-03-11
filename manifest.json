@@ -1,7 +1,7 @@
 {
-    "name": "Aclimate conmigo",
-    "short_name": "Clima",
-    "description": "Tu para mantenerte al tanto del clima",
+    "name": "Pixabay",
+    "short_name": "Imgenes",
+    "description": "Tu app para encontrar imagenes god",
     "lang":"es-mx",
     "display": "standalone", 
     "background_color": "#ffffff",
@@ -21,14 +21,14 @@
     ],
   "screenshots": [
     {
-      "src": "icons/PC.PNG",
-      "sizes": "1350x607",
+      "src": "img/PC.PNG",
+      "sizes": "1353x606",
       "type": "image/png",
       "form_factor": "wide"
     },
     {
       "src": "img/movil.PNG",
-      "sizes": "665x608",
+      "sizes": "196x440",
       "type": "image/png",
       "form_factor": "narrow"
     }

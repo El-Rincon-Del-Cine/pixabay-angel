@@ -6,12 +6,7 @@ var cacheFiles = [
     './manifest.json',
     './js/app.js',
     './icons/192.png',
-    './icons/512.png',
-    './icons/lluvia.png',
-    './icons/sol.png',
-    './icons/tormenta.png',
-    './icons/nevado.png',
-    './icons/sn.png'
+    './icons/512.png'
 ];
 
 //metodo de instalacion del sw e inicia la cache y muestra los archivos que no se pudieron instalar
@@ -85,8 +80,8 @@ self.addEventListener('fetch', function(e) {
 
 self.addEventListener('message', event => {
     if (event.data && event.data.type === 'SHOW_NOTIFICATION') {
-        self.registration.showNotification("Tu app del clima te espera", {
-            body: "¿Tienes frio? ¿Quieres saber como está el clima? Entra y averigualo",
+        self.registration.showNotification("Pixabay, tu buscador de imagenes", {
+            body: "Entra y busca las imagenes de tu agrado",
             icon: "./icons/icono1.png"
         });
     }

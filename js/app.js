@@ -86,24 +86,22 @@ function mostrarListaImagenes(imagenes) {
 
 function mostrarImagen(url, tags, width, height, user, pageURL) {
     resultadoImagenes.innerHTML = `
-        <div class="d-flex justify-content-center align-items-center vh-100 w-100">
-            <div class="card text-white bg-dark shadow-lg p-4" style="max-width: 500px;">
-                <div class="card-body text-center">
-                    <h3 class="card-title">${tags}</h3>
-                    <img src="${url}" class="img-fluid hero-img mb-3" alt="Imagen relacionada">
-                    <p><strong>Resolución:</strong> ${width} x ${height} px</p>
-                    <p><strong>Fotógrafo:</strong> <a href="${pageURL}" target="_blank" class="text-light">${user}</a></p>
-                    <button class="btn btn-success mt-3" onclick="descargarImagen('${url}')">
-                        <i class="fas fa-download"></i> Descargar
-                    </button>
-                    <button class="btn btn-secondary mt-3" onclick="window.location.reload()">Volver</button>
-                </div>
+        <div class="card text-white bg-dark shadow-lg p-4">
+            <div class="card-body text-center">
+                <h3 class="card-title">${tags}</h3>
+                <img src="${url}" class="img-fluid hero-img mb-3" alt="Imagen relacionada">
+                <p><strong>Resolución:</strong> ${width} x ${height} px</p>
+                <p><strong>Fotógrafo:</strong> <a href="${pageURL}" target="_blank" class="text-light">${user}</a></p>
+                <button class="btn btn-success mt-3" onclick="descargarImagen('${url}')">
+                    <i class="fas fa-download"></i> Descargar
+                </button>
+                <button class="btn btn-secondary mt-3" onclick="window.location.reload()">Volver</button>
             </div>
         </div>
     `;
 }
 
-// Función para forzar la descarga de la imagen
+// ⚡ Función para forzar la descarga de la imagen
 function descargarImagen(url) {
     fetch(url)
         .then(response => response.blob()) // Convertimos la imagen en un blob
