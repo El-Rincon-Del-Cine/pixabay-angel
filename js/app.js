@@ -4,7 +4,6 @@ if ('serviceWorker' in navigator) {
             .then((registration) => {
                 console.log('Service Worker registrado', registration.scope);
 
-                // Solicita permiso para las notificaciones al cargar la página
                 if (Notification.permission === "default") {
                     Notification.requestPermission().then(permission => {
                         if (permission === "granted") {
@@ -29,7 +28,6 @@ const resultadoImagenes = document.getElementById('imageResult');
 btnBuscar.addEventListener('click', function () {
     const terminoBusqueda = inputCaja.value.trim();
     if (terminoBusqueda) {
-        console.log("Buscando imágenes para:", terminoBusqueda);
         buscarImagenes(terminoBusqueda);
     } else {
         alert("Por favor, ingresa un término de búsqueda.");
@@ -40,21 +38,12 @@ async function buscarImagenes(termino) {
     const url = `https://pixabay.com/api/?key=${apiKey}&q=${encodeURIComponent(termino)}&image_type=photo&pretty=true`;
 
     try {
-        console.log("Consultando API:", url);
         const response = await fetch(url);
-
         if (!response.ok) {
             throw new Error("Error al conectar con la API");
         }
-
         const data = await response.json();
-        console.log("Datos recibidos:", data);
-
-        if (!data.hits || data.hits.length === 0) {
-            resultadoImagenes.innerHTML = `<p class="text-danger">No se encontraron imágenes.</p>`;
-        } else {
-            mostrarListaImagenes(data.hits);
-        }
+        mostrarListaImagenes(data.hits);
     } catch (error) {
         console.error("Error:", error);
         resultadoImagenes.innerHTML = `<p class="text-danger">${error.message}</p>`;
@@ -92,27 +81,11 @@ function mostrarImagen(url, tags, width, height, user, pageURL) {
                 <img src="${url}" class="img-fluid hero-img mb-3" alt="Imagen relacionada">
                 <p><strong>Resolución:</strong> ${width} x ${height} px</p>
                 <p><strong>Fotógrafo:</strong> <a href="${pageURL}" target="_blank" class="text-light">${user}</a></p>
-                <button class="btn btn-success mt-3" onclick="descargarImagen('${url}')">
+                <a href="${url}" download="imagen_pixabay.jpg" class="btn btn-success mt-3">
                     <i class="fas fa-download"></i> Descargar
-                </button>
+                </a>
                 <button class="btn btn-secondary mt-3" onclick="window.location.reload()">Volver</button>
             </div>
         </div>
     `;
-}
-
-// ⚡ Función para forzar la descarga de la imagen
-function descargarImagen(url) {
-    fetch(url)
-        .then(response => response.blob()) // Convertimos la imagen en un blob
-        .then(blob => {
-            const enlace = document.createElement("a");
-            enlace.href = URL.createObjectURL(blob); // Creamos una URL temporal
-            enlace.download = "imagen_pixabay.jpg"; // Nombre de la imagen
-            document.body.appendChild(enlace);
-            enlace.click(); 
-            document.body.removeChild(enlace);
-            URL.revokeObjectURL(enlace.href);
-        })
-        .catch(error => console.error("Error al descargar la imagen:", error));
 }
