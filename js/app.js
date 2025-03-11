@@ -129,21 +129,29 @@ async function descargarImagen(url) {
                 return;
             } catch (pickerError) {
                 console.error("Error en showSaveFilePicker:", pickerError);
-                alert("No se pudo guardar la imagen con showSaveFilePicker.");
+                alert("No se pudo guardar la imagen directamente. Se abrirá en otra ventana.");
             }
         }
 
         // Método de respaldo: descarga normal
-        const enlace = document.createElement("a");
         const blobUrl = URL.createObjectURL(blob);
-        enlace.href = blobUrl;
-        enlace.download = "imagen_pixabay.jpg";
-        document.body.appendChild(enlace);
-        enlace.click();
-        document.body.removeChild(enlace);
-        URL.revokeObjectURL(blobUrl);
+
+        // Si la descarga normal falla, abrir en otra ventana
+        try {
+            const enlace = document.createElement("a");
+            enlace.href = blobUrl;
+            enlace.download = "imagen_pixabay.jpg";
+            document.body.appendChild(enlace);
+            enlace.click();
+            document.body.removeChild(enlace);
+            URL.revokeObjectURL(blobUrl);
+        } catch (downloadError) {
+            console.error("Error en descarga automática:", downloadError);
+            window.open(url, "_blank"); // 🔹 Abre la imagen en una nueva pestaña
+        }
     } catch (error) {
         console.error("Error al descargar la imagen:", error);
         alert("Hubo un problema al descargar la imagen.");
+        window.open(url, "_blank"); // 🔹 Abre la imagen si todo lo demás falla
     }
 }
