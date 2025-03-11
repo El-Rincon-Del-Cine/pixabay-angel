@@ -101,26 +101,32 @@ function mostrarImagen(url, tags, width, height, user, pageURL) {
     `;
 }
 
-async function compartirImagen(url) {
+async function descargarImagen(url) {
     try {
         const response = await fetch(url);
         if (!response.ok) throw new Error("No se pudo descargar la imagen");
 
         const blob = await response.blob();
-        const archivo = new File([blob], "imagen.jpg", { type: blob.type });
 
-        if (navigator.canShare && navigator.canShare({ files: [archivo] })) {
-            await navigator.share({
-                files: [archivo],
-                title: "Descarga tu imagen",
-                text: "Guarda esta imagen en tu dispositivo"
-            });
+        if ('showSaveFilePicker' in window) {
+            // Usar el sistema de archivos nativo
+            const opciones = {
+                suggestedName: "imagen.jpg",
+                types: [{
+                    description: "Imagen JPG",
+                    accept: { "image/jpeg": [".jpg"] }
+                }]
+            };
+            const archivo = await window.showSaveFilePicker(opciones);
+            const stream = await archivo.createWritable();
+            await stream.write(blob);
+            await stream.close();
+            alert("Imagen guardada correctamente");
         } else {
-            alert("Tu dispositivo no admite compartir archivos.");
+            throw new Error("El sistema de archivos no está disponible.");
         }
     } catch (error) {
-        console.error("Error al compartir la imagen:", error);
-        alert("No se pudo compartir la imagen.");
+        console.error("Error al descargar la imagen:", error);
+        alert("No se pudo descargar la imagen.");
     }
 }
-
