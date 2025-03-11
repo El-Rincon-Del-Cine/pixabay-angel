@@ -106,15 +106,16 @@ async function descargarImagen(url) {
     try {
         const response = await fetch(url);
         const blob = await response.blob();
-
-        // Verifica si estamos en una PWA instalada
+        
         const esPWA = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone;
 
         if (esPWA && window.showSaveFilePicker) {
-            // Usa el selector de archivos en PWA
             const handle = await window.showSaveFilePicker({
                 suggestedName: "imagen_pixabay.jpg",
-                types: [{ description: "Imagen JPG", accept: { "image/jpeg": [".jpg"] } }]
+                types: [{
+                    description: "Imagen JPG",
+                    accept: { "image/jpeg": [".jpg"] }
+                }]
             });
 
             const writable = await handle.createWritable();
@@ -122,14 +123,15 @@ async function descargarImagen(url) {
             await writable.close();
             alert("Imagen guardada correctamente en la PWA.");
         } else {
-            // Si no es una PWA, intenta la descarga normal
             const enlace = document.createElement("a");
-            enlace.href = URL.createObjectURL(blob);
+            const blobUrl = URL.createObjectURL(blob);
+
+            enlace.href = blobUrl;
             enlace.download = "imagen_pixabay.jpg";
             document.body.appendChild(enlace);
             enlace.click();
             document.body.removeChild(enlace);
-            URL.revokeObjectURL(enlace.href);
+            URL.revokeObjectURL(blobUrl);
         }
     } catch (error) {
         console.error("Error al descargar la imagen:", error);
