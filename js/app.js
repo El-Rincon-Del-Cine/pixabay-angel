@@ -101,57 +101,26 @@ function mostrarImagen(url, tags, width, height, user, pageURL) {
     `;
 }
 
-// Solución para la descarga en PWA
-async function descargarImagen(url) {
+async function compartirImagen(url) {
     try {
         const response = await fetch(url);
         if (!response.ok) throw new Error("No se pudo descargar la imagen");
 
         const blob = await response.blob();
-        console.log("Imagen descargada como Blob:", blob);
+        const archivo = new File([blob], "imagen.jpg", { type: blob.type });
 
-        const esPWA = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone;
-
-        if (esPWA && window.showSaveFilePicker) {
-            try {
-                const handle = await window.showSaveFilePicker({
-                    suggestedName: "imagen_pixabay.jpg",
-                    types: [{
-                        description: "Imagen JPG",
-                        accept: { "image/jpeg": [".jpg"] }
-                    }]
-                });
-
-                const writable = await handle.createWritable();
-                await writable.write(blob);
-                await writable.close();
-                alert("Imagen guardada correctamente en la PWA.");
-                return;
-            } catch (pickerError) {
-                console.error("Error en showSaveFilePicker:", pickerError);
-                alert("No se pudo guardar la imagen directamente. Se abrirá en otra ventana.");
-            }
-        }
-
-        // Método de respaldo: descarga normal
-        const blobUrl = URL.createObjectURL(blob);
-
-        // Si la descarga normal falla, abrir en otra ventana
-        try {
-            const enlace = document.createElement("a");
-            enlace.href = blobUrl;
-            enlace.download = "imagen_pixabay.jpg";
-            document.body.appendChild(enlace);
-            enlace.click();
-            document.body.removeChild(enlace);
-            URL.revokeObjectURL(blobUrl);
-        } catch (downloadError) {
-            console.error("Error en descarga automática:", downloadError);
-            window.open(url, "_blank"); // 🔹 Abre la imagen en una nueva pestaña
+        if (navigator.canShare && navigator.canShare({ files: [archivo] })) {
+            await navigator.share({
+                files: [archivo],
+                title: "Descarga tu imagen",
+                text: "Guarda esta imagen en tu dispositivo"
+            });
+        } else {
+            alert("Tu dispositivo no admite compartir archivos.");
         }
     } catch (error) {
-        console.error("Error al descargar la imagen:", error);
-        alert("Hubo un problema al descargar la imagen.");
-        window.open(url, "_blank"); // 🔹 Abre la imagen si todo lo demás falla
+        console.error("Error al compartir la imagen:", error);
+        alert("No se pudo compartir la imagen.");
     }
 }
+
