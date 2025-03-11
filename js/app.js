@@ -104,15 +104,20 @@ function mostrarImagen(url, tags, width, height, user, pageURL) {
 // Solución para la descarga en PWA
 function descargarImagen(url) {
     fetch(url)
-        .then(response => response.blob()) // Convertimos la imagen en un blob
+        .then(response => response.blob())
         .then(blob => {
+            // Intenta crear un enlace de descarga
             const enlace = document.createElement("a");
-            enlace.href = URL.createObjectURL(blob); // Creamos una URL temporal
-            enlace.download = "imagen_pixabay.jpg"; // Nombre de la imagen
+            enlace.href = URL.createObjectURL(blob);
+            enlace.download = "imagen_pixabay.jpg"; // Nombre del archivo
             document.body.appendChild(enlace);
-            enlace.click(); 
+            enlace.click();
             document.body.removeChild(enlace);
             URL.revokeObjectURL(enlace.href);
         })
-        .catch(error => console.error("Error al descargar la imagen:", error));
+        .catch(error => {
+            console.error("Error al descargar la imagen:", error);
+            // Si la descarga falla, abre la imagen en una nueva pestaña
+            window.open(url, "_blank");
+        });
 }
