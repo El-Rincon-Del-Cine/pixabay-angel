@@ -105,34 +105,43 @@ function mostrarImagen(url, tags, width, height, user, pageURL) {
 async function descargarImagen(url) {
     try {
         const response = await fetch(url);
+        if (!response.ok) throw new Error("No se pudo descargar la imagen");
+
         const blob = await response.blob();
-        
+        console.log("Imagen descargada como Blob:", blob);
+
         const esPWA = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone;
 
         if (esPWA && window.showSaveFilePicker) {
-            const handle = await window.showSaveFilePicker({
-                suggestedName: "imagen_pixabay.jpg",
-                types: [{
-                    description: "Imagen JPG",
-                    accept: { "image/jpeg": [".jpg"] }
-                }]
-            });
+            try {
+                const handle = await window.showSaveFilePicker({
+                    suggestedName: "imagen_pixabay.jpg",
+                    types: [{
+                        description: "Imagen JPG",
+                        accept: { "image/jpeg": [".jpg"] }
+                    }]
+                });
 
-            const writable = await handle.createWritable();
-            await writable.write(blob);
-            await writable.close();
-            alert("Imagen guardada correctamente en la PWA.");
-        } else {
-            const enlace = document.createElement("a");
-            const blobUrl = URL.createObjectURL(blob);
-
-            enlace.href = blobUrl;
-            enlace.download = "imagen_pixabay.jpg";
-            document.body.appendChild(enlace);
-            enlace.click();
-            document.body.removeChild(enlace);
-            URL.revokeObjectURL(blobUrl);
+                const writable = await handle.createWritable();
+                await writable.write(blob);
+                await writable.close();
+                alert("Imagen guardada correctamente en la PWA.");
+                return;
+            } catch (pickerError) {
+                console.error("Error en showSaveFilePicker:", pickerError);
+                alert("No se pudo guardar la imagen con showSaveFilePicker.");
+            }
         }
+
+        // Método de respaldo: descarga normal
+        const enlace = document.createElement("a");
+        const blobUrl = URL.createObjectURL(blob);
+        enlace.href = blobUrl;
+        enlace.download = "imagen_pixabay.jpg";
+        document.body.appendChild(enlace);
+        enlace.click();
+        document.body.removeChild(enlace);
+        URL.revokeObjectURL(blobUrl);
     } catch (error) {
         console.error("Error al descargar la imagen:", error);
         alert("Hubo un problema al descargar la imagen.");
