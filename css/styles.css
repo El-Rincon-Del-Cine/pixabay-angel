@@ -4,6 +4,8 @@ body {
     background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
     background-size: 400% 400%;
     animation: fondoAnimado 10s infinite alternate ease-in-out;
+    font-family: 'Bebas Neue', sans-serif;
+    color: white;
 }
 
 @keyframes fondoAnimado {
@@ -15,7 +17,6 @@ h1 {
     font-size: 3rem;
     text-shadow: 3px 3px 10px #00c3ff;
     animation: glow 2s infinite alternate;
-    color: white;
 }
 
 @keyframes glow {
@@ -51,30 +52,51 @@ h1 {
     transform: scale(1.1);
 }
 
-#heroResult {
+#image-container, #favorites-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
     margin-top: 20px;
 }
 
-.list-group-item {
+.contenedor-imagen {
     background: rgba(255, 255, 255, 0.1);
-    color: #00c3ff;
-    font-weight: bold;
-    transition: 0.3s;
-}
-
-.list-group-item:hover {
-    background: #ff0099;
-    color: white;
-    transform: scale(1.05);
-}
-
-.hero-img {
-    width: 300px;
     border-radius: 10px;
-    box-shadow: 0px 0px 10px #00c3ff;
+    padding: 10px;
+    text-align: center;
     transition: transform 0.3s;
 }
 
-.hero-img:hover {
+.contenedor-imagen:hover {
+    transform: scale(1.05);
+}
+
+.imagen {
+    width: 100%;
+    max-width: 300px;
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px #00c3ff;
+}
+
+.boton-descargar, .boton-favorito {
+    background: #00c3ff;
+    border: none;
+    padding: 10px;
+    margin: 5px;
+    border-radius: 5px;
+    font-size: 1rem;
+    color: #000;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.boton-descargar:hover, .boton-favorito:hover {
+    background: #ff0099;
+    box-shadow: 0px 0px 15px #ff0099;
     transform: scale(1.1);
+}
+
+#favorites-container {
+    margin-top: 20px;
 }
