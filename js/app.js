@@ -22,98 +22,136 @@ if ('serviceWorker' in navigator) {
 }
 
 const apiKey = '49289919-e711188a26aff37e0277420d1';
-const inputCaja = document.getElementById('caja');
-const btnBuscar = document.getElementById('btn');
-const resultadoImagenes = document.getElementById('imageResult');
 
-btnBuscar.addEventListener('click', function () {
-    const terminoBusqueda = inputCaja.value.trim();
-    if (terminoBusqueda) {
-        console.log("Buscando imágenes para:", terminoBusqueda);
-        buscarImagenes(terminoBusqueda);
-    } else {
-        alert("Por favor, ingresa un término de búsqueda.");
+// Función para buscar imágenes
+async function buscarImagenes() {
+    const query = document.getElementById('query').value;
+    if (!query) {
+        alert('Por favor, ingresa un término de búsqueda.');
+        return;
     }
-});
-
-async function buscarImagenes(termino) {
-    const url = `https://pixabay.com/api/?key=${apiKey}&q=${encodeURIComponent(termino)}&image_type=photo&pretty=true`;
-
+    const url = `https://pixabay.com/api/?key=${apiKey}&q=${encodeURIComponent(query)}&image_type=photo&pretty=true`;
     try {
-        console.log("Consultando API:", url);
         const response = await fetch(url);
-
         if (!response.ok) {
-            throw new Error("Error al conectar con la API");
+            throw new Error('Error al obtener las imágenes');
         }
-
         const data = await response.json();
-        console.log("Datos recibidos:", data);
-
-        if (!data.hits || data.hits.length === 0) {
-            resultadoImagenes.innerHTML = `<p class="text-danger">No se encontraron imágenes.</p>`;
-        } else {
-            mostrarListaImagenes(data.hits);
-        }
+        mostrarImagenes(data.hits);
     } catch (error) {
-        console.error("Error:", error);
-        resultadoImagenes.innerHTML = `<p class="text-danger">${error.message}</p>`;
+        console.error('Error al buscar imágenes:', error);
+        alert('Error al cargar las imágenes. Inténtalo de nuevo.');
     }
 }
 
-function mostrarListaImagenes(imagenes) {
-    resultadoImagenes.innerHTML = '';
+// Función para mostrar las imágenes
+function mostrarImagenes(imagenes) {
+    const contenedorImagenes = document.getElementById('image-container');
+    contenedorImagenes.innerHTML = ''; // Limpiar contenedor antes de agregar nuevas imágenes
+
+    if (imagenes.length === 0) {
+        contenedorImagenes.innerHTML = '<p>No se encontraron imágenes.</p>';
+        return;
+    }
 
     imagenes.forEach(imagen => {
-        const col = document.createElement('div');
-        col.classList.add('col');
+        const contenedor = document.createElement('div');
+        contenedor.classList.add('contenedor-imagen');
 
-        col.innerHTML = `
-            <div class="card h-100 shadow-lg text-center">
-                <img src="${imagen.previewURL}" class="card-img-top" alt="Imagen">
-                <div class="card-body">
-                    <p class="card-text">${imagen.tags}</p>
-                    <button class="btn btn-primary" onclick="mostrarImagen('${imagen.largeImageURL}', '${imagen.tags}', ${imagen.imageWidth}, ${imagen.imageHeight}, '${imagen.user}', '${imagen.pageURL}')">
-                        Ver Detalles
-                    </button>
-                </div>
-            </div>
-        `;
+        const imgElement = document.createElement('img');
+        imgElement.src = imagen.webformatURL; // Usamos `webformatURL` para la imagen pequeña
+        imgElement.alt = imagen.tags; // Pixabay usa `tags` para la descripción
+        imgElement.classList.add('imagen');
 
-        resultadoImagenes.appendChild(col);
+        // Botón de descarga
+        const botonDescargar = document.createElement('button');
+        botonDescargar.classList.add('boton-descargar');
+        botonDescargar.textContent = 'Descargar';
+        botonDescargar.onclick = () => descargarImagen(imagen.largeImageURL, `imagen_${imagen.id}.jpg`); // Usamos `largeImageURL` para la descarga
+
+        // Botón de favoritos
+        const botonFavorito = document.createElement('button');
+        botonFavorito.classList.add('boton-favorito');
+        botonFavorito.textContent = 'Añadir a Favoritos';
+        botonFavorito.onclick = () => agregarAFavoritos(imagen);
+
+        contenedor.appendChild(imgElement);
+        contenedor.appendChild(botonDescargar);
+        contenedor.appendChild(botonFavorito);
+        contenedorImagenes.appendChild(contenedor);
     });
 }
 
-function mostrarImagen(url, tags, width, height, user, pageURL) {
-    resultadoImagenes.innerHTML = `
-        <div class="card text-white bg-dark shadow-lg p-4">
-            <div class="card-body text-center">
-                <h3 class="card-title">${tags}</h3>
-                <img src="${url}" class="img-fluid hero-img mb-3" alt="Imagen relacionada">
-                <p><strong>Resolución:</strong> ${width} x ${height} px</p>
-                <p><strong>Fotógrafo:</strong> <a href="${pageURL}" target="_blank" class="text-light">${user}</a></p>
-                <button class="btn btn-success mt-3" onclick="descargarImagen('${url}')">
-                    <i class="fas fa-download"></i> Descargar
-                </button>
-                <button class="btn btn-secondary mt-3" onclick="window.location.reload()">Volver</button>
-            </div>
-        </div>
-    `;
-}
-
-// Función para forzar la descarga de la imagen
-function descargarImagen(url) {
-     try {
+// Función para descargar una imagen
+async function descargarImagen(url, nombreArchivo) {
+    try {
         const response = await fetch(url);
         const blob = await response.blob();
         const link = document.createElement('a');
         link.href = URL.createObjectURL(blob);
-        link.download = filename;
+        link.download = nombreArchivo;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
     } catch (error) {
-        console.error('Error descargando la imagen:', error);
-        showFeedback('Error al descargar la imagen. Inténtalo de nuevo.');
+        console.error('Error al descargar la imagen:', error);
+        alert('Error al descargar la imagen. Inténtalo de nuevo.');
     }
 }
+
+// Función para añadir una imagen a favoritos
+function agregarAFavoritos(imagen) {
+    let favoritos = JSON.parse(localStorage.getItem('favoritos')) || [];
+    if (!favoritos.some(fav => fav.id === imagen.id)) {
+        favoritos.push(imagen);
+        localStorage.setItem('favoritos', JSON.stringify(favoritos));
+        alert('Imagen añadida a favoritos');
+        mostrarFavoritos();
+    } else {
+        alert('La imagen ya está en favoritos');
+    }
+}
+
+// Función para mostrar las imágenes favoritas
+function mostrarFavoritos() {
+    const contenedorFavoritos = document.getElementById('favorites-grid');
+    contenedorFavoritos.innerHTML = ''; // Limpiar contenedor antes de agregar nuevas imágenes
+
+    const favoritos = JSON.parse(localStorage.getItem('favoritos')) || [];
+    if (favoritos.length === 0) {
+        contenedorFavoritos.innerHTML = '<p>No hay imágenes en favoritos.</p>';
+        return;
+    }
+
+    favoritos.forEach(imagen => {
+        const contenedor = document.createElement('div');
+        contenedor.classList.add('contenedor-imagen');
+
+        const imgElement = document.createElement('img');
+        imgElement.src = imagen.webformatURL; // Usamos `webformatURL` para la imagen pequeña
+        imgElement.alt = imagen.tags; // Pixabay usa `tags` para la descripción
+        imgElement.classList.add('imagen');
+
+        // Botón de descarga para favoritos
+        const botonDescargar = document.createElement('button');
+        botonDescargar.classList.add('boton-descargar');
+        botonDescargar.textContent = 'Descargar';
+        botonDescargar.onclick = () => descargarImagen(imagen.largeImageURL, `imagen_${imagen.id}.jpg`); // Usamos `largeImageURL` para la descarga
+
+        contenedor.appendChild(imgElement);
+        contenedor.appendChild(botonDescargar);
+        contenedorFavoritos.appendChild(contenedor);
+    });
+}
+
+// Función para mostrar/ocultar la sección de favoritos
+document.getElementById('toggle-favorites').addEventListener('click', () => {
+    const contenedorFavoritos = document.getElementById('favorites-container');
+    contenedorFavoritos.style.display = contenedorFavoritos.style.display === 'none' ? 'block' : 'none';
+    mostrarFavoritos();
+});
+
+// Mostrar favoritos al cargar la página
+window.addEventListener('load', () => {
+    mostrarFavoritos();
+});
