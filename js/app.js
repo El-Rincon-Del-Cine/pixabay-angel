@@ -101,33 +101,18 @@ function mostrarImagen(url, tags, width, height, user, pageURL) {
     `;
 }
 
-async function descargarImagen(url) {
-    try {
-        const response = await fetch(url);
-        if (!response.ok) throw new Error("No se pudo descargar la imagen");
-
-        const blob = await response.blob();
-
-        if ('showSaveFilePicker' in window) {
-            // Usar el sistema de archivos nativo
-            const opciones = {
-                suggestedName: "imagen.jpg",
-                types: [{
-                    description: "Imagen JPG",
-                    accept: { "image/jpeg": [".jpg"] }
-                }]
-            };
-            const archivo = await window.showSaveFilePicker(opciones);
-            const stream = await archivo.createWritable();
-            await stream.write(blob);
-            await stream.close();
-            alert("Imagen guardada correctamente");
-        } else {
-            throw new Error("El sistema de archivos no está disponible.");
-        }
-    } catch (error) {
-        console.error("Error al descargar la imagen:", error);
-        alert("No se pudo descargar la imagen.");
-    }
+// ⚡ Función para forzar la descarga de la imagen
+function descargarImagen(url) {
+    fetch(url)
+        .then(response => response.blob()) // Convertimos la imagen en un blob
+        .then(blob => {
+            const enlace = document.createElement("a");
+            enlace.href = URL.createObjectURL(blob); // Creamos una URL temporal
+            enlace.download = "imagen_pixabay.jpg"; // Nombre de la imagen
+            document.body.appendChild(enlace);
+            enlace.click(); 
+            document.body.removeChild(enlace);
+            URL.revokeObjectURL(enlace.href);
+        })
+        .catch(error => console.error("Error al descargar la imagen:", error));
 }
-});
