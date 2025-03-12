@@ -102,39 +102,17 @@ function mostrarImagen(url, tags, width, height, user, pageURL) {
 }
 
 // Función para forzar la descarga de la imagen
-async function descargarImagen(url) {
-    try {
-        // Intenta descargar directamente
-        const enlaceDirecto = document.createElement("a");
-        enlaceDirecto.href = url;
-        enlaceDirecto.download = "imagen_pixabay.jpg";
-        document.body.appendChild(enlaceDirecto);
-        enlaceDirecto.click();
-        document.body.removeChild(enlaceDirecto);
-    } catch (error) {
-        console.error("Error con descarga directa, intentando con fetch:", error);
-
-        // Si falla, intenta con fetch y blob
-        try {
-            const response = await fetch(url);
-            if (!response.ok) {
-                throw new Error("Error al descargar la imagen");
-            }
-
-            const blob = await response.blob();
-            const blobUrl = URL.createObjectURL(blob);
-
-            const enlaceBlob = document.createElement("a");
-            enlaceBlob.href = blobUrl;
-            enlaceBlob.download = "imagen_pixabay.jpg";
-            document.body.appendChild(enlaceBlob);
-            enlaceBlob.click();
-            document.body.removeChild(enlaceBlob);
-
-            URL.revokeObjectURL(blobUrl);
-        } catch (error) {
-            console.error("Error al descargar la imagen:", error);
-            alert("Error al descargar la imagen. Inténtalo de nuevo.");
-        }
-    }
+function descargarImagen(url) {
+    fetch(url)
+        .then(response => response.blob()) // Convertimos la imagen en un blob
+        .then(blob => {
+            const enlace = document.createElement("a");
+            enlace.href = URL.createObjectURL(blob); // Creamos una URL temporal
+            enlace.download = "imagen_pixabay.jpg"; // Nombre de la imagen
+            document.body.appendChild(enlace);
+            enlace.click(); 
+            document.body.removeChild(enlace);
+            URL.revokeObjectURL(enlace.href);
+        })
+        .catch(error => console.error("Error al descargar la imagen:", error));
 }
