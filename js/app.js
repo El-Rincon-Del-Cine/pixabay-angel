@@ -102,8 +102,9 @@ function mostrarImagen(url, tags, width, height, user, pageURL) {
 }
 
 // ⚡ Función para forzar la descarga de la imagen
-async function descargarImagen(url, filename) {
+async function downloadImage(url, filename) {
     try {
+        // Intenta el primer método (async/await)
         const response = await fetch(url);
         const blob = await response.blob();
         const link = document.createElement('a');
@@ -112,8 +113,30 @@ async function descargarImagen(url, filename) {
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
+        URL.revokeObjectURL(link.href); // Liberar la URL temporal
     } catch (error) {
-        console.error('Error descargando la imagen:', error);
-        showFeedback('Error al descargar la imagen. Inténtalo de nuevo.');
+        console.error('Error con el primer método, intentando el segundo:', error);
+        
+        try {
+            // Intenta el segundo método (then/catch)
+            fetch(url)
+                .then(response => response.blob())
+                .then(blob => {
+                    const enlace = document.createElement("a");
+                    enlace.href = URL.createObjectURL(blob);
+                    enlace.download = filename || "imagen_pixabay.jpg"; // Usa el nombre proporcionado o uno por defecto
+                    document.body.appendChild(enlace);
+                    enlace.click();
+                    document.body.removeChild(enlace);
+                    URL.revokeObjectURL(enlace.href); // Liberar la URL temporal
+                })
+                .catch(error => {
+                    console.error('Error con el segundo método:', error);
+                    showFeedback('Error al descargar la imagen. Inténtalo de nuevo.');
+                });
+        } catch (error) {
+            console.error('Error con ambos métodos:', error);
+            showFeedback('Error al descargar la imagen. Inténtalo de nuevo.');
+        }
     }
 }
