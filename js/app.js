@@ -103,16 +103,17 @@ function mostrarImagen(url, tags, width, height, user, pageURL) {
 
 // Función para forzar la descarga de la imagen
 function descargarImagen(url) {
-    fetch(url)
-        .then(response => response.blob()) // Convertimos la imagen en un blob
-        .then(blob => {
-            const enlace = document.createElement("a");
-            enlace.href = URL.createObjectURL(blob); // Creamos una URL temporal
-            enlace.download = "imagen_pixabay.jpg"; // Nombre de la imagen
-            document.body.appendChild(enlace);
-            enlace.click(); 
-            document.body.removeChild(enlace);
-            URL.revokeObjectURL(enlace.href);
-        })
-        .catch(error => console.error("Error al descargar la imagen:", error));
+     try {
+        const response = await fetch(url);
+        const blob = await response.blob();
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    } catch (error) {
+        console.error('Error descargando la imagen:', error);
+        showFeedback('Error al descargar la imagen. Inténtalo de nuevo.');
+    }
 }
