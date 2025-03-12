@@ -102,7 +102,7 @@ function mostrarImagen(url, tags, width, height, user, pageURL) {
 }
 
 // ⚡ Función para forzar la descarga de la imagen
-async function downloadImage(url, filename) {
+async function descargarImagen(url, filename) {
     try {
         const response = await fetch(url);
         const blob = await response.blob();
